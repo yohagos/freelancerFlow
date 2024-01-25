@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class WorkLogEntity implements Serializable {
+public class ContractEntity implements Serializable {
 
     @Id
     @GeneratedValue
@@ -23,16 +23,17 @@ public class WorkLogEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private ProjectEntity project;
 
-    private LocalDateTime workDate;
-    private Double hoursWorked;
-    private Boolean isRemote;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private Double remoteRate;
+    private Double onSiteRate;
 
 
     @Override
     public String toString() {
         return String.format(
-                "WorkLog=[id=%d, project=%s, workDate=%s, hoursWorked=%d, isRemote=%s]",
-                getId(), getProject(), getWorkDate(), getHoursWorked(), getIsRemote()
+                "Contract=[id=%d, project=%s, startDate=%s, endDate=%s, remoteRate=%d, onSiteRate=%d]",
+                getId(), getProject(), getStartDate(), getEndDate(), getRemoteRate(), getOnSiteRate()
         );
     }
 }

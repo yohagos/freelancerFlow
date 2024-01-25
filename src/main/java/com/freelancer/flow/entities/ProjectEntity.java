@@ -20,11 +20,10 @@ public class ProjectEntity implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private ClientEntity client;
 
-    @Column(nullable = true)
-    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
     private RecruiterEntity recruiter;
 
     private String projectName;
