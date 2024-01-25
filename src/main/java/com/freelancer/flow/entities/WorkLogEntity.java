@@ -20,7 +20,8 @@ public class WorkLogEntity implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "project_id", nullable = false)
     private ProjectEntity project;
 
     private LocalDateTime workDate;
@@ -31,7 +32,7 @@ public class WorkLogEntity implements Serializable {
     @Override
     public String toString() {
         return String.format(
-                "WorkLog=[id=%d, project=%s, workDate=%s, hoursWorked=%d, isRemote=%s]",
+                "WorkLog=[id=%d, project=%s, workDate=%s, hoursWorked=%s, isRemote=%s]",
                 getId(), getProject(), getWorkDate(), getHoursWorked(), getIsRemote()
         );
     }

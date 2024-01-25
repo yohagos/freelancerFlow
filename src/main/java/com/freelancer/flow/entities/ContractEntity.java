@@ -20,7 +20,7 @@ public class ContractEntity implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
     private ProjectEntity project;
 
     private LocalDateTime startDate;
@@ -32,7 +32,7 @@ public class ContractEntity implements Serializable {
     @Override
     public String toString() {
         return String.format(
-                "Contract=[id=%d, project=%s, startDate=%s, endDate=%s, remoteRate=%d, onSiteRate=%d]",
+                "Contract=[id=%d, project=%s, startDate=%s, endDate=%s, remoteRate=%s, onSiteRate=%s]",
                 getId(), getProject(), getStartDate(), getEndDate(), getRemoteRate(), getOnSiteRate()
         );
     }
