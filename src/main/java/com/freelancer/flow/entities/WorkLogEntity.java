@@ -1,39 +1,35 @@
 package com.freelancer.flow.entities;
 
+import com.freelancer.flow.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Type;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Getter
+@Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class WorkLogEntity implements Serializable {
-
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "project_id", nullable = false)
+public class WorkLogEntity extends BaseEntity {
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "project_id")
     private ProjectEntity project;
-
     private LocalDateTime workDate;
     private Double hoursWorked;
     private Boolean isRemote;
-
+    @Column(columnDefinition = "TEXT", length = 1024)
+    private String notice;
 
     @Override
     public String toString() {
-        return String.format(
-                "WorkLog=[id=%d, project=%s, workDate=%s, hoursWorked=%s, isRemote=%s]",
-                getId(), getProject(), getWorkDate(), getHoursWorked(), getIsRemote()
-        );
+        return String.format("WorkLog=[project=%s, event=%s, categoryId=%s, notice=%s]",
+                getProject().getId(), getWorkDate(), getHoursWorked(), getNotice());
     }
 }

@@ -1,0 +1,39 @@
+services:
+  postgres:
+    container_name: freelancer-flow-db
+    image: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_DB: freelancer_flow
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - 5432:5432
+    networks:
+      - freelancer-flow-network
+    restart: unless-stopped
+
+  keycloak:
+    container_name: freelancer-keycloak
+    image: quay.io/keycloak/keycloak:24.0.4
+    ports:
+      - 9090:8080
+    depends_on:
+      - postgres
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    networks:
+      - freelancer-flow-network
+    command:
+      - "start-dev"
+
+networks:
+  freelancer-flow-network:
+    driver: bridge
+
+volumes:
+  postgres:
+    driver: local

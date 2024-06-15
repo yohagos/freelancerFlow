@@ -1,30 +1,31 @@
 package com.freelancer.flow.entities;
 
-import jakarta.persistence.*;
+import com.freelancer.flow.common.BaseEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Getter
+@Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class ProjectEntity implements Serializable {
+public class ProjectEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "client_id", nullable = false)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "client_id")
     private ClientEntity client;
 
-    @ManyToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "recruiter_id", nullable = true)
     private RecruiterEntity recruiter;
 
@@ -32,12 +33,8 @@ public class ProjectEntity implements Serializable {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 
-
     @Override
     public String toString() {
-        return String.format(
-                "Project=[id=%d, client=%s, recruiter=%s, projectName=%s, startDate=%s, ednDate=%s]",
-                getId(), getClient(), getRecruiter(), getProjectName(), getStartDate(), getEndDate()
-        );
+        return String.format("Project=[client=%s, recruiter=%s, projectName=%s]", getClient().getId(), getRecruiter().getId(), getProjectName());
     }
 }

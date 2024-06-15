@@ -1,39 +1,28 @@
 package com.freelancer.flow.entities;
 
+import com.freelancer.flow.common.BaseEntity;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-import java.io.Serializable;
-
-@Data
-@Builder
+@Getter
+@Setter
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class ClientEntity implements Serializable {
-
-    @Id
-    @GeneratedValue
-    private Long id;
-
+public class ClientEntity extends BaseEntity {
     private String companyName;
     private String clientName;
     private String clientEmail;
     private String website;
     private String phone;
 
-
     @Override
     public String toString() {
-        return String.format(
-                "Client=[id=%d, companyName=%s, clientName=%s, clientEmail=%s, website=%s, phone=%s]",
-                getId(), getCompanyName(), getClientName(), getClientEmail(), getWebsite(), getPhone()
-        );
+        return String.format("Client=[companyName=%s, clientName=%s, clientEmail=%s]", getCompanyName(), getClientName(), getClientEmail());
     }
-
 }
