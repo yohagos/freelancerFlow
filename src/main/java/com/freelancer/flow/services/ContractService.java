@@ -8,11 +8,12 @@ import com.freelancer.flow.requests.ContractRequest;
 import com.freelancer.flow.responses.ContractResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +22,6 @@ import java.util.Optional;
 import static com.freelancer.flow.enums.CategoryEnum.CONTRACT;
 import static com.freelancer.flow.enums.EventEnum.*;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ContractService {
@@ -29,6 +29,7 @@ public class ContractService {
     private final ContractRepository contractRepository;
     private final ContractMapper contractMapper;
     private final EventService eventService;
+    private final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     public PageResponse<ContractResponse> getContracts(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
@@ -59,7 +60,8 @@ public class ContractService {
         var con = contractMapper.toContract(request);
         var contract = contractRepository.save(con);
 
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 CONTRACT,
                 ADD,
                 null,
@@ -92,7 +94,8 @@ public class ContractService {
 
         contractRepository.save(contract);
 
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 CONTRACT,
                 EDIT,
                 null,
@@ -108,7 +111,8 @@ public class ContractService {
         var contract = contractRepository
                 .findById(contractId)
                 .orElseThrow();
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 CONTRACT,
                 DELETE,
                 null,

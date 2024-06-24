@@ -7,14 +7,10 @@ import com.freelancer.flow.services.RecruiterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@Slf4j
 @RestController
 @RequestMapping("recruiters")
 @RequiredArgsConstructor
@@ -39,6 +35,7 @@ public class RecruiterController {
         return ResponseEntity.ok(recruiterService.getRecruiter(recruiterId));
     }
 
+
     @PostMapping
     public ResponseEntity<Integer> saveRecruiter(
             @Valid @RequestBody RecruiterRequest request
@@ -57,7 +54,6 @@ public class RecruiterController {
     public ResponseEntity<?> deleteRecruiterById(
             @PathVariable("recruiterId") Integer recruiterId
     ) {
-        log.warn(recruiterId.toString());
         recruiterService.deleteRecruiter(recruiterId);
         return ResponseEntity.accepted().build();
     }

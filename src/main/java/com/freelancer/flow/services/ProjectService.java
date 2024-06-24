@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
     private final EventService eventService;
+    private final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     public PageResponse<ProjectResponse> getProjects(
             int page,
@@ -60,7 +63,8 @@ public class ProjectService {
         var pro = projectMapper.toProject(request);
         var project = projectRepository.save(pro);
 
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 PROJECT,
                 ADD,
                 project,
@@ -89,7 +93,8 @@ public class ProjectService {
                 .ifPresent(project::setEndDate);
         projectRepository.save(project);
 
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 PROJECT,
                 EDIT,
                 project,
@@ -106,7 +111,8 @@ public class ProjectService {
         var project = projectRepository
                 .findById(projectId)
                         .orElseThrow();
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 PROJECT,
                 DELETE,
                 project,

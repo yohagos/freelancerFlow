@@ -8,11 +8,12 @@ import com.freelancer.flow.requests.ClientRequest;
 import com.freelancer.flow.responses.ClientResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.Optional;
 import static com.freelancer.flow.enums.CategoryEnum.CLIENT;
 import static com.freelancer.flow.enums.EventEnum.*;
 
-@Slf4j
+
 @Service
 @RequiredArgsConstructor
 public class ClientService {
@@ -29,6 +30,7 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
     private final EventService eventService;
+    private final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     public PageResponse<ClientResponse> getClients(
             int page,
@@ -62,7 +64,8 @@ public class ClientService {
         var cl = clientMapper.toClient(request);
         var client = clientRepository.save(cl);
 
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 CLIENT,
                 ADD,
                 null,
@@ -94,7 +97,8 @@ public class ClientService {
                 .filter(phone -> !phone.isEmpty() || !phone.equals(client.getPhone()))
                 .ifPresent(client::setPhone);
         clientRepository.save(client);
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 CLIENT,
                 EDIT,
                 null,
@@ -112,7 +116,8 @@ public class ClientService {
                 .findById(clientId)
                 .orElseThrow();
         clientRepository.delete(client);
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 CLIENT,
                 DELETE,
                 null,

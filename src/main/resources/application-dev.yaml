@@ -5,8 +5,8 @@ application:
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/freelancer_flow
-    username: admin
-    password: admin
+    username: admindb
+    password: admindb
     #driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

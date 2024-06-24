@@ -8,11 +8,12 @@ import com.freelancer.flow.requests.WorkLogRequest;
 import com.freelancer.flow.responses.WorkLogResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
 import static com.freelancer.flow.enums.CategoryEnum.WORK_LOG;
 import static com.freelancer.flow.enums.EventEnum.ADD;
 
-@Slf4j
+
 @Service
 @RequiredArgsConstructor
 public class WorkLogService {
@@ -28,6 +29,7 @@ public class WorkLogService {
     private final WorkLogRepository workLogRepository;
     private final WorkLogMapper workLogMapper;
     private final EventService eventService;
+    private final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     public List<WorkLogResponse> getWorkLogs() {
         return workLogRepository.findAll()
@@ -43,10 +45,9 @@ public class WorkLogService {
     }
 
     public Integer save(WorkLogRequest request) {
-        var wlog = workLogMapper.toWorkLog(request);
-        log.info(wlog.toString());
-        var workLog = workLogRepository.save(wlog);
+        var workLog = workLogRepository.save(workLogMapper.toWorkLog(request));
         eventService.createEventEntry(
+                auth,
                 WORK_LOG,
                 ADD,
                 null,

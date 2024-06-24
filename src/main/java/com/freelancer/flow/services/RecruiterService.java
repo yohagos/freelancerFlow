@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class RecruiterService {
     private final RecruiterRepository recruiterRepository;
     private final RecruiterMapper recruiterMapper;
     private final EventService eventService;
+    private final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
     public PageResponse<RecruiterResponse> getRecruiters(int page, int size, Authentication connectedUser) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
@@ -58,7 +60,9 @@ public class RecruiterService {
     public Integer save(RecruiterRequest request) {
         var rec = recruiterMapper.toRecruiter(request);
         var recruiter = recruiterRepository.save(rec);
-        eventService.createEventEntry(
+
+        eventService.createEventEntryAsync(
+                auth,
                 RECRUITER,
                 ADD,
                 null,
@@ -89,7 +93,8 @@ public class RecruiterService {
                 .filter(web -> !web.isEmpty() || !web.contentEquals(recruiter.getWebsite()))
                 .ifPresent(recruiter::setAgency);
         recruiterRepository.save(recruiter);
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 RECRUITER,
                 EDIT,
                 null,
@@ -108,7 +113,8 @@ public class RecruiterService {
         log.warn(recruiter.toString());
         recruiterRepository.deleteById(recruiterId);
 
-        eventService.createEventEntry(
+        eventService.createEventEntryAsync(
+                auth,
                 RECRUITER,
                 DELETE,
                 null,

@@ -9,16 +9,17 @@ import com.freelancer.flow.repositories.EventRepository;
 import com.freelancer.flow.responses.EventResponse;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -50,6 +51,7 @@ public class EventService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createEventEntry(
+            @Nullable Authentication authentication,
             CategoryEnum category,
             EventEnum event,
             @Nullable ProjectEntity project,
@@ -103,11 +105,15 @@ public class EventService {
             eventEntity.setCategoryId(workLog.getId());
             eventEntity.setNotice(workLog.getNotice());
         }
+        assert authentication != null;
+        eventEntity.setCreatedBy(authentication.getName());
+        eventEntity.setCreatedDate(LocalDateTime.now());
         eventRepository.save(eventEntity);
     }
 
     @Async
-    public CompletableFuture<Void> createEventEntryAsync(
+    public void createEventEntryAsync(
+            Authentication authentication,
             CategoryEnum category,
             EventEnum event,
             @Nullable ProjectEntity project,
@@ -116,11 +122,12 @@ public class EventService {
             @Nullable ContractEntity contract,
             @Nullable WorkLogEntity workLog
     ) {
-        return CompletableFuture.runAsync(() ->
+        CompletableFuture.supplyAsync(() ->
                 {
-                    createEventEntry(category, event, project, recruiter, client, contract, workLog);
+                    createEventEntry(authentication, category, event, project, recruiter, client, contract, workLog);
+                    return null;
                 }
-        );
+        ).join();
     }
 
 }
